@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="WindowsServiceSample" Language="1033" Version="1.0.0.0" Manufacturer="Alexandre Ito" UpgradeCode="3e3310b5-4972-40a9-b798-fbb5096c595f">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Interface -->
+    <UIRef Id="WixUI_Common" />
+    <UIRef Id="UserInterface" />
+
+    <Feature Id="ProductFeature" Title="ServiceInstaller" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+    
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="WindowsServiceSample" />
+			</Directory>
+		</Directory>
+    
+    <SetDirectory Id="INSTALLFOLDER" Value="[WindowsVolume]WindowServiceSample" />
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="ProductComponent" Guid="91561683-5bd2-40f3-92c5-788aa16c4ee4">
+        
+        <File Source="$(var.ServiceSample.TargetPath)" KeyPath="yes" />
+        <File Source="$(var.ServiceSample.TargetDir)Common.Logging.dll" />
+        <File Source="$(var.ServiceSample.TargetDir)Common.Logging.Core.dll" />
+        <File Source="$(var.ServiceSample.TargetDir)log4net.config" />
+        <File Source="$(var.ServiceSample.TargetDir)log4net.dll" />
+        <File Source="$(var.ServiceSample.TargetDir)Quartz.dll" />
+        <File Source="$(var.ServiceSample.TargetDir)README.md" />
+
+        <ServiceInstall
+          Id="ServiceInstaller"
+          Type="ownProcess"
+          Name="WindowsServiceSample"
+          DisplayName="WindowsServiceSample"
+          Description="A windows service sample"
+          Start="auto"
+          Account="[SERVICEACCOUNT]"
+          Password="[SERVICEPASSWORD]"
+          ErrorControl="normal" />
+        <ServiceControl Id="StartService" Start="install" Stop="both" Remove="both" Name="WindowsServiceSample" Wait="yes" />
+        
+      </Component>
+		</ComponentGroup>
+	</Fragment>
+
+  <Fragment>
+    <UI Id="UserInterface">
+      <Property Id="WixUI_Mode" Value="Custom" />
+
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
+      <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="UserExit" />
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
+    </UI>
+  </Fragment>
+  
+</Wix>
